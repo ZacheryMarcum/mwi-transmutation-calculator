@@ -8,6 +8,7 @@ import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 import './App.css';
 import './components/MaterialStyles.css';
 import { ItemNumberInterval, calculateExpectedOutputByItemName, calculateRequiredTransmutations } from './utils/transmutationCalculator';
+import InfoButton from './components/InfoButton';
 
 const AppContent: React.FC = () => {
     // State for transmutation item, target item, alpha level, and results
@@ -92,12 +93,34 @@ const AppContent: React.FC = () => {
                                 onClick={() => handleViewToggle('transmuteFrom')}
                             >
                                 Transmute From
+                                <InfoButton
+                                        content={
+                                            <div>
+                                                <p>
+                                                    Given an input item to transmute and relevant data, see data about
+                                                    the output of the transmutation.
+                                                </p>
+                                            </div>
+                                        }
+                                        position="bottom"
+                                />
                             </button>
                             <button 
                                 className={activeView === 'transmuteTo' ? 'active' : ''} 
                                 onClick={() => handleViewToggle('transmuteTo')}
                             >
                                 Transmute To
+                                <InfoButton
+                                        content={
+                                            <div>
+                                                <p>
+                                                    Given a target output item and relevant data, see data about the
+                                                    input required to get that output.
+                                                </p>
+                                            </div>
+                                        }
+                                        position="bottom"
+                                />
                             </button>
                         </div>
                     </div>

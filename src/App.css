@@ -137,3 +137,117 @@ td {
     background-color: #4a4a4a;
     color: white;
 }
+
+/* Info button */
+
+.info-button-container {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 4px;
+}
+
+.info-icon {
+  cursor: pointer;
+  color: #6e6e6e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.info-icon:hover {
+  color: #3a96dd;
+}
+
+.info-button-content {
+  position: absolute;
+  z-index: 100;
+  width: 240px;
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Theme-specific styles */
+.info-button-content.light {
+  background-color: white;
+  color: #333;
+  border: 1px solid #e0e0e0;
+}
+
+.info-button-content.dark {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+/* Position variants */
+.info-button-content.top {
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.info-button-content.right {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.info-button-content.bottom {
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.info-button-content.left {
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Arrow styling */
+.info-button-content::after {
+  content: '';
+  position: absolute;
+  border-width: 6px;
+  border-style: solid;
+}
+
+.info-button-content.top::after {
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-color: inherit;
+  border-top-color: inherit;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+
+.info-button-content.right::after {
+  top: 50%;
+  right: 100%;
+  margin-top: -6px;
+  border-color: transparent;
+  border-right-color: inherit;
+}
+
+.info-button-content.bottom::after {
+  bottom: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-color: transparent;
+  border-bottom-color: inherit;
+}
+
+.info-button-content.left::after {
+  top: 50%;
+  left: 100%;
+  margin-top: -6px;
+  border-color: transparent;
+  border-left-color: inherit;
+}
