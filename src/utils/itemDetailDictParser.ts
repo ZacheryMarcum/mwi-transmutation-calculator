@@ -28,6 +28,20 @@ export function getItemAlchemyDetails(itemKey: string) {
     return itemsDetailDict[itemKey].alchemyDetail;
 }
 
+/**
+ * Returns the item's level or 1 if undefined for any reason.
+ */
+export function getRequiredLevel(itemKey: string): number {
+    return itemsDetailDict[itemKey].itemLevel || 1;
+}
+
+/**
+ * Returns the item's transmute success rate or 0.5 if undefined for any reason
+ */
+export function getTransmuteBaseSuccessRate(itemKey: string): number {
+    return getItemAlchemyDetails(itemKey)?.transmuteSuccessRate ?? 0.5;
+}
+
 export function getDropTable(itemKey: string) {
     return itemsDetailDict[itemKey].alchemyDetail?.transmuteDropTable ?? [];
 }
@@ -63,5 +77,16 @@ export function getItemListTransmutesInto(itemName: string): string[] {
             itemList.push(itemKeyToName(itemKey));
         }
     }
-    return itemList
+    return itemList;
+}
+
+export function getObtainableViaTransmutationList() {
+    const itemNameList: string[] = [];
+    for (const itemKey in itemsDetailDict) {
+        const options = getItemListTransmutesInto(itemKeyToName(itemKey));
+        if (options.length > 0) {
+            itemNameList.push(itemKeyToName(itemKey));
+        }
+    }
+    return itemNameList;
 }

@@ -3,7 +3,7 @@ import { getTransmutableList } from '../utils/itemDetailDictParser';
 import BaseItemSelectionComponent from './BaseItemSelectionComponent';
 
 interface TransmuteFromSelectProps {
-    onSelect: (itemName: string, quantity: number, alpha: string, successModifier: number) => void;
+    onSelect: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
 }
 
 const TransmuteFromSelect: React.FC<TransmuteFromSelectProps> = ({ onSelect }) => {

@@ -281,3 +281,27 @@ input:checked + .theme-slider:before {
   table-layout: auto;
 }
 
+/* Checkbox styles */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.material-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.material-checkbox input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.material-checkbox.dark {
+  color: var(--text-color-primary-dark);
+}
+

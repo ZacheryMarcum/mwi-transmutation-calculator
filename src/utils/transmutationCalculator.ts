@@ -1,4 +1,4 @@
-import { itemNameToKey, getDropTable, itemKeyToName, getItemNameList, getItemListTransmutesInto, getItemAlchemyDetails } from "./itemDetailDictParser";
+import { itemNameToKey, getDropTable, itemKeyToName, getItemNameList, getItemListTransmutesInto, getItemAlchemyDetails, getRequiredLevel, getTransmuteBaseSuccessRate } from "./itemDetailDictParser";
 
 // This file contains functions that perform calculations related to transmutation, including expected output and confidence intervals based on the input data.
 
@@ -39,12 +39,15 @@ export function calculateExpectedOutputByItemName(
     itemName: string,
     quantity: number,
     alpha: number = 0.05,
-    successModifier: number = 1,
+    level: number = 1,
+    catalyticTea: boolean = false,
+    catalyst: boolean = false,
+    primeCatalyst: boolean = false,
 ): ItemNumberInterval[] {
-    console.log(`Quantity: ${quantity}`)
     const itemKey = itemNameToKey(itemName);
     const alchemyDetails = getItemAlchemyDetails(itemKey);
     const drops: TransmutationDropEntry[] = alchemyDetails?.transmuteDropTable ?? [];
+    const successChance = calculateSuccessChance(itemKey, level, catalyticTea, catalyst, primeCatalyst);
 
     if (!drops.length) {
         console.error(`No drop table found for item ${itemName}`);
@@ -52,8 +55,6 @@ export function calculateExpectedOutputByItemName(
     }
 
     return drops.map(drop => {
-        // Cap alchemy success rate at 100%
-        const successChance = Math.min((alchemyDetails?.transmuteSuccessRate ?? 0.5) * successModifier, 1);
         const dropsPerSuccess = drop.minCount;
         const combinedChance = successChance * drop.dropRate;
         const expectedOutput = drop.dropRate * quantity * successChance * dropsPerSuccess;
@@ -80,7 +81,10 @@ export function calculateRequiredTransmutations(
     targetItem: string,
     targetQuantity: number,
     alpha: number = 0.05,
-    successModifier = 1,
+    level: number = 1,
+    catalyticTea: boolean = false,
+    catalyst: boolean = false,
+    primeCatalyst: boolean = false,
 ): ItemNumberInterval[] {
     const transmuteItems = getItemListTransmutesInto(targetItem);
     
@@ -106,11 +110,12 @@ export function calculateRequiredTransmutations(
         
         // Calculate expected transmutations needed
         const dropChance = targetDrop.dropRate;
-        // Cap alchemy success rate at 100%
-        const successChance = Math.min((getItemAlchemyDetails(itemKey)?.transmuteSuccessRate ?? 0) * successModifier, 1);
+        // Different success modifier per item since the item levels are different
+        // -> must be calculated in the map function
+        const successChance = calculateSuccessChance(itemKey, level, catalyticTea, catalyst, primeCatalyst)
         const dropsPerSuccess = targetDrop.minCount;
         const combinedSuccess = dropChance * successChance;
-        const expectedTransmutations = targetQuantity / (combinedSuccess * dropsPerSuccess);
+        const expectedTransmutations = targetQuantity / dropsPerSuccess * (1 - combinedSuccess) / combinedSuccess;
         
         // Standard deviation for negative binomial distribution - modified to account for drops per success
         const stdDev = Math.sqrt(targetQuantity / dropsPerSuccess * (1 - combinedSuccess) / (combinedSuccess * combinedSuccess));
@@ -137,6 +142,13 @@ export function confidenceIntervalPercentageToZScore(
     const zScore = Math.sqrt(2) * erfcinv(alpha);
     return zScore;
 }
+
+/**
+ * The erfcinv function is a numerical approximation of the inverse complementary error function.
+ * It is used to calculate the z-score corresponding to a given confidence interval percentage.
+ * The function takes a number x as input and returns the z-score.
+ * The function uses the inverse complementary error function (erfcinv) to calculate the z-score.
+ */
 function erfcinv(x: number): number {
     if (x >= 2) {
         return -Math.sqrt(-Math.log((x - 1) / 2));
@@ -149,10 +161,7 @@ function erfcinv(x: number): number {
     const z = Math.sqrt(y * y - 4 * a * y);
     return Math.sqrt(z) - Math.sqrt(z + 4 * a);
 }
-// The erfcinv function is a numerical approximation of the inverse complementary error function.
-// It is used to calculate the z-score corresponding to a given confidence interval percentage.
-// The function takes a number x as input and returns the z-score.
-// The function uses the inverse complementary error function (erfcinv) to calculate the z-score.
+
 
 
 const alphaToZScoreDict: {[alpha: number]: number} = {
@@ -162,4 +171,37 @@ const alphaToZScoreDict: {[alpha: number]: number} = {
     0.005: 2.807
 }
 
+export function calculateSuccessModifier(
+    itemKey: string,
+    level: number = 1,
+    catalyticTea: boolean = false,
+    catalyst: boolean = false,
+    primeCatalyst: boolean = false,
+) {
+    const itemLevel = getRequiredLevel(itemKey);
 
+    const levelPenalty = Math.max(0, 0.9 - 0.9 * level / itemLevel);
+    const levelMod = 1 - levelPenalty;
+
+    const catalyticTeaMod = catalyticTea ? 1.05 : 1;
+    const catalystMod = catalyst ? 1.15 : 1;
+    const primeCatalystMod = primeCatalyst ? 1.25 : 1;
+
+    return levelMod * catalyticTeaMod * catalystMod * primeCatalystMod;
+}
+
+export function calculateSuccessChance(
+    itemKey: string,
+    level: number = 1,
+    catalyticTea: boolean = false,
+    catalyst: boolean = false,
+    primeCatalyst: boolean = false,
+) {
+    // Cap success chance at 90%
+    const base = getTransmuteBaseSuccessRate(itemKey);
+    const mod = calculateSuccessModifier(itemKey, level, catalyticTea, catalyst, primeCatalyst);
+    return Math.min(
+        0.9,
+        base * mod
+    );
+}

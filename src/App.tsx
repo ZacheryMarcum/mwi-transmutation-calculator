@@ -17,7 +17,10 @@ const AppContent: React.FC = () => {
     const [targetItem, setTargetItem] = useState<string>('');
     const [targetQuantity, setTargetQuantity] = useState<number>(1);
     const [alphaLevel, setAlphaLevel] = useState<number>(0.05);
-    const [successModifier, setSuccessModifier] = useState<number>(1);
+    const [level, setLevel] = useState<number>(1);
+    const [catalyticTea, setCatalyticTea] = useState<boolean>(false);
+    const [catalyst, setCatalyst] = useState<boolean>(false);
+    const [primeCatalyst, setPrimeCatalyst] = useState<boolean>(false);
     const [transmutationResults, setTransmutationResults] = useState<ItemNumberInterval[]>([]);
     const [requiredItemsResults, setRequiredItemsResults] = useState<ItemNumberInterval[]>([]);
     const [activeView, setActiveView] = useState<'transmuteFrom' | 'transmuteTo'>('transmuteFrom');
@@ -32,23 +35,29 @@ const AppContent: React.FC = () => {
         setActiveView(selectionView);
     };
 
-    const handleItemSelect = (itemName: string, quantity: number, alpha: string, successMod: number) => {
+    const handleItemSelect = (itemName: string, quantity: number, alpha: string, itemLevel: number, tea: boolean, cat: boolean, primeCat: boolean) => {
         if (itemName && quantity > 0) {
             setTransmutationItem(itemName);
             setTransmutationQuantity(quantity);
             setAlphaLevel(parseFloat(alpha));
-            setSuccessModifier(successMod);
+            setLevel(itemLevel);
+            setCatalyticTea(tea);
+            setCatalyst(cat);
+            setPrimeCatalyst(primeCat);
             setActiveView('transmuteFrom');
         }
     };
 
-    const handleTargetItemSelect = (item: string, quantity: number, alpha: string, successMod: number) => {
+    const handleTargetItemSelect = (item: string, quantity: number, alpha: string, itemLevel: number, tea: boolean, cat: boolean, primeCat: boolean) => {
         setTargetItem(item);
         setTargetQuantity(quantity);
         if (alpha) {
             setAlphaLevel(parseFloat(alpha));
         }
-        setSuccessModifier(successMod);
+        setLevel(itemLevel);
+        setCatalyticTea(tea);
+        setCatalyst(cat);
+        setPrimeCatalyst(primeCat);
         setActiveView('transmuteTo');
     };
 
@@ -59,8 +68,11 @@ const AppContent: React.FC = () => {
             const transResults = calculateExpectedOutputByItemName(
                 transmutationItem, 
                 transmutationQuantity, 
-                alphaLevel, 
-                successModifier
+                alphaLevel,
+                level,
+                catalyticTea,
+                catalyst,
+                primeCatalyst
             );
             setTransmutationResults(transResults);
         }
@@ -70,12 +82,15 @@ const AppContent: React.FC = () => {
             const reqResults = calculateRequiredTransmutations(
                 targetItem, 
                 targetQuantity, 
-                alphaLevel, 
-                successModifier
+                alphaLevel,
+                level,
+                catalyticTea,
+                catalyst,
+                primeCatalyst
             );
             setRequiredItemsResults(reqResults);
         }
-    }, [transmutationItem, targetItem, transmutationQuantity, targetQuantity, alphaLevel, successModifier]);
+    }, [transmutationItem, targetItem, transmutationQuantity, targetQuantity, alphaLevel, level, catalyticTea, catalyst, primeCatalyst]);
 
     return (
         <div className={`app-container ${theme}`}>

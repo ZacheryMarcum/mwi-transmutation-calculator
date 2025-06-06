@@ -4,7 +4,7 @@ import './MaterialStyles.css';
 import InfoButton from './InfoButton';
 
 interface BaseItemSelectionProps {
-    onSelect: (itemName: string, quantity: number, alpha: string, successModifier: number) => void;
+    onSelect: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
     title: string;
     itemLabel: string;
     itemOptions: string[];
@@ -29,10 +29,11 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
     const [selectedItem, setSelectedItem] = useState<string>('');
     const [quantity, setQuantity] = useState<number>(1);
     const [alphaLevel, setAlphaLevel] = useState<string>('0.05');
-    const [successModifier, setSuccessModifier] = useState<number>(1);
-    const { theme } = useContext(ThemeContext);
-
-    const handleItemChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const [level, setLevel] = useState<number>(1);
+    const [catalyticTea, setCatalyticTea] = useState<boolean>(false);
+    const [catalyst, setCatalyst] = useState<boolean>(false);
+    const [primeCatalyst, setPrimeCatalyst] = useState<boolean>(false);
+    const { theme } = useContext(ThemeContext);    const handleItemChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedItem(event.target.value);
     };
 
@@ -44,21 +45,31 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
         setAlphaLevel(event.target.value);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleLevelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLevel(Number(event.target.value));
+    };
+
+    const handleCatalyticTeaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCatalyticTea(event.target.checked);
+    };
+
+    const handleCatalystChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCatalyst(event.target.checked);
+    };
+
+    const handlePrimeCatalystChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPrimeCatalyst(event.target.checked);
+    };    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (selectedItem && quantity > 0) {
             onSelect(
                 selectedItem,
                 quantity,
                 alphaLevel,
-                (() => {
-                    if (successModifier.toString() == "NaN") {
-                        setSuccessModifier(1);
-                        return 1;
-                    } else {
-                        return successModifier;
-                    }
-                })()
+                level,
+                catalyticTea,
+                catalyst,
+                primeCatalyst
             );
         }
     };
@@ -69,16 +80,6 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
             <div className="form-group">
                 <label htmlFor={itemSelectId} className={`material-label ${theme}`}>
                     {itemLabel}
-                    {/* <InfoButton
-                        content={
-                            <div>
-                                <p>
-                                    TODO
-                                </p>
-                            </div>
-                        }
-                        position="bottom"
-                    /> */}
                 </label>
                 <select
                     id={itemSelectId}
@@ -97,16 +98,6 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
             <div className="form-group">
                 <label htmlFor={quantityId} className={`material-label ${theme}`}>
                     Quantity:
-                    {/* <InfoButton
-                        content={
-                            <div>
-                                <p>
-                                    TODO - or scrap
-                                </p>
-                            </div>
-                        }
-                        position="bottom"
-                    /> */}
                 </label>
                 <input
                     type="number"
@@ -140,53 +131,71 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
                     <option value="0.005">99.5%</option>
                     <option value="0.01">99%</option>
                     <option value="0.05">95%</option>
-                    <option value="0.1">90%</option>
-                </select>
+                    <option value="0.1">90%</option>                </select>
             </div>
             <div className="form-group">
-                <label htmlFor={`${itemSelectId}-success-modifier`} className={`material-label ${theme}`}>
-                    Success Modifier:
+                <label htmlFor="level" className={`material-label ${theme}`}>
+                    Alchemist Level:
                     <InfoButton
                         content={
                             <div>
                                 <p>
-                                    The percentage modifier for your transmutation success rate.
-                                    (Can be lower than 100% to indicate that there is a penalty to success chance)
+                                    Character's level affects transmutation success chance.
                                 </p>
                             </div>
                         }
                         position="bottom"
                     />
                 </label>
-                <div className={`${theme}`}>
-                    <input
-                        type="text"
-                        id={`${itemSelectId}-success-modifier`}
-                        value={`${Math.round(successModifier * 100)}%`}
-                        onChange={(e) => {
-                            // Remove any non-numeric characters except decimal point
-                            let value = e.target.value.replace(/[^\d.]/g, '');
-                            const numericValue = parseFloat(value);
-                            if (!isNaN(numericValue)) {
-                                setSuccessModifier(numericValue / 100);
-                            } else if (value === '' || value === '.') {
-                                // Allow empty input or just decimal point
-                                setSuccessModifier(0);
-                            }
-                        }}
-                        onKeyDown={(e) => {
-                            // Handle backspace when cursor is at the end (after %)
-                            if (e.key === 'Backspace' && 
-                                e.currentTarget.selectionStart === e.currentTarget.value.length) {
-                                const currentValue = Math.round(successModifier * 100);
-                                // Remove last digit
-                                const newValue = Math.floor(currentValue / 10);
-                                setSuccessModifier(newValue / 100);
-                                e.preventDefault();
-                            }
-                        }}
-                        className={`material-input ${theme}`}
+                <input
+                    type="number"
+                    id="level"
+                    value={level}
+                    onChange={handleLevelChange}
+                    min="1"
+                    max="100"
+                    className={`material-input ${theme}`}
+                />
+            </div>
+            <div className="form-group">
+                <label className={`material-label ${theme}`}>
+                    Catalysts:
+                    <InfoButton
+                        content={
+                            <div>
+                                <p>
+                                    These items increase transmutation success chance.
+                                </p>
+                            </div>
+                        }
+                        position="bottom"
                     />
+                </label>
+                <div className="checkbox-group">
+                    <label className={`material-checkbox ${theme}`}>
+                        <input
+                            type="checkbox"
+                            checked={catalyticTea}
+                            onChange={handleCatalyticTeaChange}
+                        />
+                        Catalytic Tea
+                    </label>
+                    <label className={`material-checkbox ${theme}`}>
+                        <input
+                            type="checkbox"
+                            checked={catalyst}
+                            onChange={handleCatalystChange}
+                        />
+                        Catalyst
+                    </label>
+                    <label className={`material-checkbox ${theme}`}>
+                        <input
+                            type="checkbox"
+                            checked={primeCatalyst}
+                            onChange={handlePrimeCatalystChange}
+                        />
+                        Prime Catalyst
+                    </label>
                 </div>
             </div>
 
