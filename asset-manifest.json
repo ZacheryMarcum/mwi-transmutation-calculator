@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/mwi-transmutation-calculator/static/css/main.2f344484.css",
-    "main.js": "/mwi-transmutation-calculator/static/js/main.d224c99f.js",
+    "main.css": "/mwi-transmutation-calculator/static/css/main.0d95f821.css",
+    "main.js": "/mwi-transmutation-calculator/static/js/main.9850a943.js",
     "index.html": "/mwi-transmutation-calculator/index.html",
-    "main.2f344484.css.map": "/mwi-transmutation-calculator/static/css/main.2f344484.css.map",
-    "main.d224c99f.js.map": "/mwi-transmutation-calculator/static/js/main.d224c99f.js.map"
+    "main.0d95f821.css.map": "/mwi-transmutation-calculator/static/css/main.0d95f821.css.map",
+    "main.9850a943.js.map": "/mwi-transmutation-calculator/static/js/main.9850a943.js.map"
   },
   "entrypoints": [
-    "static/css/main.2f344484.css",
-    "static/js/main.d224c99f.js"
+    "static/css/main.0d95f821.css",
+    "static/js/main.9850a943.js"
   ]
 }
