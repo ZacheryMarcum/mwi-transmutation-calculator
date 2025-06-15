@@ -293,17 +293,54 @@ input:checked + .theme-slider:before {
   border-color: #555;
 }
 
+.material-table th {
+  background-color: #eee;
+}
+
 .material-table.dark th {
   background-color: #333;
   color: #e0e0e0;
+  color: var(--text-on-primary);
+  border-color: #555;
+}
+
+.material-table.light
+
+.material-table.dark td {
+  border-color: #444;
 }
 
 .material-table.dark tr:nth-child(even) {
   background-color: #2a2a2a;
 }
 
+.material-table tr:hover {
+  background-color: var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
 .material-table.dark tr:hover {
   background-color: #3a3a3a;
+}
+
+.material-table.dark .sortable-header:hover {
+  background-color: var(--primary-color);
+}
+
+.material-table th {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 2px solid var(--border-color);
+  font-weight: 500;
+}
+
+.material-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.material-table tr:nth-child(even) {
+  background-color: var(--input-background);
 }
 
 .table-container {
@@ -315,6 +352,29 @@ input:checked + .theme-slider:before {
 .material-table {
   min-width: 100%;
   table-layout: auto;
+  border-collapse: collapse;
+}
+
+/* Sortable table headers */
+.sortable-header {
+  cursor: pointer;
+  position: relative;
+  padding-right: 20px;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.sortable-header:hover {
+  background-color: var(--input-background);
+}
+
+.sort-indicator {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
 }
 
 /* Checkbox styles */
