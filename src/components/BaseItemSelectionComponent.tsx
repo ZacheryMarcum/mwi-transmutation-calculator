@@ -176,6 +176,7 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
                     id={quantityId}
                     value={quantity}
                     onChange={handleQuantityChange}
+                    onWheel={(e) => e.currentTarget.blur()}
                     min="1"
                     className={`material-input ${theme}`}
                 />
@@ -198,6 +199,7 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
                     id={alphaId}
                     value={alphaLevel}
                     onChange={handleAlphaChange}
+                    onWheel={(e) => e.currentTarget.blur()}
                     className={`material-select ${theme}`}
                 >
                     <option value="0.005">99.5%</option>
@@ -224,6 +226,7 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
                     id="level"
                     value={level}
                     onChange={handleLevelChange}
+                    onWheel={(e) => e.currentTarget.blur()}
                     min="1"
                     max="200"
                     className={`material-input ${theme}`}
