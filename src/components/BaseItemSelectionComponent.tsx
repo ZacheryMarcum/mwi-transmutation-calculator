@@ -225,7 +225,7 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
                     value={level}
                     onChange={handleLevelChange}
                     min="1"
-                    max="100"
+                    max="200"
                     className={`material-input ${theme}`}
                 />
             </div>
