@@ -3,13 +3,13 @@ import { getTransmutableList } from '../utils/itemDetailDictParser';
 import BaseItemSelectionComponent from './BaseItemSelectionComponent';
 
 interface TransmuteFromSelectProps {
-    onSelect: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
+    onSubmit: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
 }
 
-const TransmuteFromSelect: React.FC<TransmuteFromSelectProps> = ({ onSelect }) => {
+const TransmuteFromSelect: React.FC<TransmuteFromSelectProps> = ({ onSubmit }) => {
     return (
         <BaseItemSelectionComponent 
-            onSelect={onSelect}
+            onSubmit={onSubmit}
             title="Transmute from Current Items"
             itemLabel="Select Item:"
             itemOptions={getTransmutableList()}

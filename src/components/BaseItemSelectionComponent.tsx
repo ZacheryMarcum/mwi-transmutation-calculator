@@ -4,7 +4,7 @@ import './MaterialStyles.css';
 import InfoButton from './InfoButton';
 
 interface BaseItemSelectionProps {
-    onSelect: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
+    onSubmit: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
     title: string;
     itemLabel: string;
     itemOptions: string[];
@@ -16,7 +16,7 @@ interface BaseItemSelectionProps {
 }
 
 const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
-    onSelect,
+    onSubmit,
     title,
     itemLabel,
     itemOptions,
@@ -33,7 +33,53 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
     const [catalyticTea, setCatalyticTea] = useState<boolean>(false);
     const [catalyst, setCatalyst] = useState<boolean>(false);
     const [primeCatalyst, setPrimeCatalyst] = useState<boolean>(false);
-    const { theme } = useContext(ThemeContext);    const handleItemChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const [showAutocomplete, setShowAutocomplete] = useState<boolean>(false);
+    const [focusedItemIndex, setFocusedItemIndex] = useState<number>(-1);
+    const { theme } = useContext(ThemeContext);
+
+    // Get filtered suggestions
+    const getFilteredSuggestions = () => {
+        return itemOptions.filter((item) => {
+            return selectedItem === ''
+                || item.toLowerCase().includes(selectedItem.toLowerCase());
+        });
+    };
+
+    // Handle keyboard navigation
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        const suggestions = getFilteredSuggestions();
+        
+        // Arrow down
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setFocusedItemIndex(prevIndex => 
+                prevIndex < suggestions.length - 1 ? prevIndex + 1 : 0
+            );
+        }
+        // Arrow up
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setFocusedItemIndex(prevIndex => 
+                prevIndex > 0 ? prevIndex - 1 : suggestions.length - 1
+            );
+        }
+        // Enter key
+        else if (e.key === 'Enter' && focusedItemIndex >= 0 && showAutocomplete) {
+            e.preventDefault();
+            if (suggestions[focusedItemIndex]) {
+                setSelectedItem(suggestions[focusedItemIndex]);
+                setShowAutocomplete(false);
+                setFocusedItemIndex(-1);
+            }
+        }
+        // Escape key
+        else if (e.key === 'Escape') {
+            setShowAutocomplete(false);
+            setFocusedItemIndex(-1);
+        }
+    };
+
+    const handleItemChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedItem(event.target.value);
     };
 
@@ -59,10 +105,12 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
 
     const handlePrimeCatalystChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPrimeCatalyst(event.target.checked);
-    };    const handleSubmit = (e: React.FormEvent) => {
+    };
+    
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (selectedItem && quantity > 0) {
-            onSelect(
+            onSubmit(
                 selectedItem,
                 quantity,
                 alphaLevel,
@@ -80,20 +128,44 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
             <div className="form-group">
                 <label htmlFor={itemSelectId} className={`material-label ${theme}`}>
                     {itemLabel}
-                </label>
-                <select
-                    id={itemSelectId}
-                    value={selectedItem}
-                    onChange={handleItemChange}
-                    className={`material-select ${theme}`}
-                >
-                    <option value="">{itemSelectPlaceholder}</option>
-                    {itemOptions.map((itemName) => (
-                        <option key={itemName} value={itemName}>
-                            {itemName}
-                        </option>
-                    ))}
-                </select>
+                </label>                <div className="autocomplete-container">
+                    <input
+                        id={itemSelectId}
+                        type="text"
+                        value={selectedItem}                        onChange={(e) => {
+                            setSelectedItem(e.target.value);
+                            setShowAutocomplete(true);
+                            setFocusedItemIndex(-1);
+                        }}
+                        onFocus={() => setShowAutocomplete(true)}
+                        onBlur={() => {
+                            // Delay hiding to allow for click on dropdown item
+                            setTimeout(() => setShowAutocomplete(false), 200);
+                        }}
+                        placeholder={itemSelectPlaceholder}
+                        className={`material-input ${theme}`}
+                        autoComplete="off"
+                        onKeyDown={handleKeyDown}
+                    />
+                    {showAutocomplete && (
+                        <div className={`autocomplete-dropdown ${theme}`}>
+                            {getFilteredSuggestions().map((item, index) => (
+                                <div
+                                    key={item}
+                                    className={`autocomplete-item ${
+                                        focusedItemIndex === index ? 'focused' : ''
+                                    }`}
+                                    onClick={() => {
+                                        setSelectedItem(item);
+                                        setShowAutocomplete(false);
+                                    }}
+                                >
+                                    {item}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
             <div className="form-group">
                 <label htmlFor={quantityId} className={`material-label ${theme}`}>
@@ -135,12 +207,12 @@ const BaseItemSelectionComponent: React.FC<BaseItemSelectionProps> = ({
             </div>
             <div className="form-group">
                 <label htmlFor="level" className={`material-label ${theme}`}>
-                    Alchemist Level:
+                    Alchemy Level:
                     <InfoButton
                         content={
                             <div>
                                 <p>
-                                    Character's level affects transmutation success chance.
+                                    Character's alchemy level affects transmutation success chance.
                                 </p>
                             </div>
                         }

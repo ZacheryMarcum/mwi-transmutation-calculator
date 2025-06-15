@@ -16,8 +16,8 @@
 }
 
 /* Dark theme variables */
-.dark-theme {
-  --primary-color: #1a237e;
+.dark {
+  --primary-color: #007bff;
   --primary-color-light: #534bae;
   --primary-color-dark: #000051;
   --text-on-primary: #ffffff;
@@ -97,6 +97,42 @@ body {
   transition: all 0.3s ease;
   color: var(--text-color-primary);
   box-sizing: border-box;
+}
+
+.autocomplete-container {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: var(--surface-color);
+  color: var(--text-color-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  z-index: 10;
+}
+
+/* Ensure dark theme styling */
+.autocomplete-dropdown.dark {
+  background-color: var(--surface-color);
+  border-color: var(--border-color);
+}
+
+.autocomplete-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--text-color-primary);
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.focused {
+  background-color: var(--input-background);
 }
 
 .material-select:focus,

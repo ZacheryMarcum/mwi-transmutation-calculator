@@ -3,13 +3,13 @@ import { getItemNameList, getObtainableViaTransmutationList } from '../utils/ite
 import BaseItemSelectionComponent from './BaseItemSelectionComponent';
 
 interface ItemSelectionProps {
-    onSelect: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
+    onSubmit: (itemName: string, quantity: number, alpha: string, level: number, catalyticTea: boolean, catalyst: boolean, primeCatalyst: boolean) => void;
 }
 
-const TransmuteToSelect: React.FC<ItemSelectionProps> = ({ onSelect }) => {
+const TransmuteToSelect: React.FC<ItemSelectionProps> = ({ onSubmit }) => {
     return (
         <BaseItemSelectionComponent 
-            onSelect={onSelect}
+            onSubmit={onSubmit}
             title="Set Item Production Target"
             itemLabel="Select Target Item:"
             itemOptions={getObtainableViaTransmutationList()}

@@ -47,46 +47,57 @@ export function getDropTable(itemKey: string) {
 }
 
 export function getItemNameList() {
-    const itemNameList: string[] = [];
-    for (const itemKey in itemsDetailDict) {
-        const itemDetail = itemsDetailDict[itemKey];
-        if (itemDetail.name) {
-            itemNameList.push(itemDetail.name);
-        }
-    }
-    return itemNameList;
+    return Object.values(itemsDetailDict)
+        .map((detail: ItemDetail) => {
+            return detail.name;
+        })
+        // Name must be not be falsy
+        .filter((name: string) => { return name; });
 }
 
 export function getTransmutableList() {
-    const itemNameList: string[] = [];
-    for (const itemKey in itemsDetailDict) {
-        const itemDetail = itemsDetailDict[itemKey];
-        if (itemDetail.name && itemDetail.alchemyDetail?.transmuteDropTable) {
-            itemNameList.push(itemDetail.name);
-        }
-    }
-    return itemNameList;
+    return Object.keys(itemsDetailDict)
+        .filter((key: string) => {
+            // Must be non-null and defined
+            return itemsDetailDict[key].alchemyDetail?.transmuteDropTable;
+        })
+        .map(itemKeyToName);
 }
 
 export function getItemListTransmutesInto(itemName: string): string[] {
-    const itemList: string[] = [];
     const targetKey = itemNameToKey(itemName);
-    for (const itemKey in itemsDetailDict) {
-        const table = getDropTable(itemKey);
-        if (table.find((x: TransmuteDropItem) => { return targetKey == x.itemHrid })) {
-            itemList.push(itemKeyToName(itemKey));
-        }
+    const transmutesIntoTarget = getTransmutesIntoItemPredicate(targetKey);
+    return Object.keys(itemsDetailDict)
+        .filter(transmutesIntoTarget)
+        .map(itemKeyToName);
+}
+
+/**
+ * Creates a predicate function that determines if a given item can be transmuted into the pre-selected target item.
+ * 
+ * @param targetKey - The key of the target item for the predicate (will be baked into the returned predicate)
+ * @returns A predicate that takes an item key and determines if it can be transmuted into the predicate's target item.
+ */
+function getTransmutesIntoItemPredicate(targetKey: string) {
+    return (givenKey: string) => {
+        const table = getDropTable(givenKey);
+        return table.find((x: TransmuteDropItem) => { return targetKey == x.itemHrid }) !== undefined;
     }
-    return itemList;
 }
 
 export function getObtainableViaTransmutationList() {
-    const itemNameList: string[] = [];
-    for (const itemKey in itemsDetailDict) {
-        const options = getItemListTransmutesInto(itemKeyToName(itemKey));
-        if (options.length > 0) {
-            itemNameList.push(itemKeyToName(itemKey));
-        }
-    }
-    return itemNameList;
+    return Object.keys(itemsDetailDict)
+        .filter(isObtainableViaTransmutation)
+        .map(itemKeyToName);
+}
+
+function isObtainableViaTransmutation(itemKey: string) {
+    const options = getItemListTransmutesInto(itemKeyToName(itemKey));
+    return options.length > 0;
+}
+
+export function getMatchedItem(input: string): string | undefined {
+    return Object.values(itemsDetailDict).find((entry) => {
+        return input.toLowerCase() == entry.name.toLowerCase();
+    })?.name;
 }
